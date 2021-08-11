@@ -29,7 +29,7 @@ def write_count_csv(filename, count):
 
 def read_history_csv(filename):
     history_list = []
-    history_num = 15
+    history_num = 15  # 只显示最近15条记录
     try:
         f = open(filename, 'r', encoding='utf-8-sig')
         reader = csv.reader(f)

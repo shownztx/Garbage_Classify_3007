@@ -6,7 +6,7 @@ from Window import Ui_MainWindow
 
 
 if __name__ == "__main__":
-    camera = Camera(1)
+    camera = Camera(1)  # 0为笔记本自带摄像头 1为USB摄像头
     app = QApplication(sys.argv)
     window = QMainWindow()
     ui = Ui_MainWindow(camera)

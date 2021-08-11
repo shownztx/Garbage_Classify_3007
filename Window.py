@@ -42,34 +42,34 @@ class Ui_MainWindow(object):
         self.label.setPixmap(pixmap)
 
     def show_dialog(self):
-        count_csv_path = "static/CSV/count.csv"
-        history_csv_path = "static/CSV/history.csv"
-        image_path = "static/photos/"
-        classification = "test"  # will update if we get the classification
-        timeout = 4
-        cap = self.camera.vc
-        ret, frame = cap.read()
-        self.history_photo_num = self.history_photo_num + 1
-        image_path = image_path + str(self.history_photo_num) + ".jpg"
-        cv2.imwrite(image_path, frame)
+        count_csv_path = "static/CSV/count.csv"  # 计数
+        history_csv_path = "static/CSV/history.csv"  # 历史记录
+        image_path = "static/photos/"  # 照片目录
+        classification = "test"  # 测试用的
+
+        timeout = 4 # 对话框停留时间
+        ret, frame = self.camera.vc.read()  # 拍照
+        self.history_photo_num = self.history_photo_num + 1  # 照片自增命名
+        image_path = image_path + str(self.history_photo_num) + ".jpg"  # 保存照片的路径
+        cv2.imwrite(image_path, frame)  # 保存
         # time.sleep(1)
 
         image = utils.load_image(image_path)
-        classify_model = self.classify_model
+        classify_model = self.classify_model  # 模型、标签的初始化在setupUi函数最后
         label_to_content = self.label_to_content
-        prediction, label = classify_image(image, classify_model)
+        prediction, label = classify_image(image, classify_model) # 调用模型
 
         print('-' * 100)
         print(f'Test one image: {image_path}')
         print(f'classification: {label_to_content[str(label)]}\nconfidence: {prediction[0, label]}')
         print('-' * 100)
 
-        classification = str(label_to_content[str(label)])
-        confidence = str(f'{prediction[0, label]}')
-        confidence = confidence[0:5]
-        self.dialog = Dialog(timeout=timeout, classification=classification, confidence=confidence)
+        classification = str(label_to_content[str(label)])  # 分类结果
+        confidence = str(f'{prediction[0, label]}')  # 置信度
+        confidence = confidence[0:5]  # 保留三位小数
+        self.dialog = Dialog(timeout=timeout, classification=classification, confidence=confidence)  # 传入结果和置信度
         self.dialog.show()
-        self.dialog.exec()
+        self.dialog.exec() # 对话框退出
 
         # 更新历史记录中count数目
         count_list = read_count_csv(filename=count_csv_path)
@@ -81,10 +81,10 @@ class Ui_MainWindow(object):
         write_history_csv(history_csv_path, classification=classification, photo_path=image_path)
         self.listWidget.clear()
         history_list = read_history_csv(history_csv_path)
-        for record in history_list:
+        for record in history_list:  # 每次都是全部重新加载，效率较低...
             # self.listWidget.addItem(record[0])
             # print(record)
-            item = QtWidgets.QListWidgetItem(QtGui.QIcon(record[1]), record[0])
+            item = QtWidgets.QListWidgetItem(QtGui.QIcon(record[1]), record[0])  # 0为类别，1为图片路径
             self.listWidget.addItem(item)
 
     def setupUi(self, MainWindow):
@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         self.countLayout.addWidget(self.count)
         MainWindow.setCentralWidget(self.widget)
 
-        # load label and model
+        # 加载模型
         classify_model, label_to_content = get_model_label()
         self.classify_model = classify_model
         self.label_to_content = label_to_content
@@ -173,12 +173,14 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        # 加载计数
         count_list = read_count_csv(filename=count_csv_path)
         self.count.setText(str(count_list[0]))
 
         # 照片编号
         self.history_photo_num = int(count_list[0])
 
+        # 加载历史记录
         history_list = read_history_csv(history_csv_path)
         for record in history_list:
             # self.listWidget.addItem(record[0])
