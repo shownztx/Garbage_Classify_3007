@@ -1,20 +1,24 @@
+# 智慧垃圾桶项目
+
 ## 说明
 
 本项目是一个带有前端界面的垃圾分类项目，加载了训练好的模型参数，模型为efficientnetb4，暂时为40分类问题。
 
-## python依赖
-
-tf2.3 、cv2、numpy、pyqt5
-
-pyqt5安装
+ 
+## 运行环境
 
 ``` shell
-pip install PyQt5
-pip install PyQt5-tools
+pip install -r requirements.txt
 ```
-## 使用
+注意：最新的opencv版本可能导致PyQt5无法正常运行，如遇到请降级。
+
+
+
+## 快速开始
+
 程序入口为main文件，pyqt5的界面为使用qt designer生成的。界面中核心的是4个控件，视频控件、计数控件、历史记录控件和分类结果对话框。
 （在window.py中的class Ui_MainWindow中setupUi函数中的最后，做了计数控件、历史记录控件和模型、标签的加载）
+
 ### 视频控件
 使用cv2抓取摄像头视频，并显示在videoLayout中的label控件label上。（名字就叫label..）（在main函数中使用语句 camera = Camera(1)  # 0为笔记本自带摄像头 1为USB摄像头 抓取视频画面。）
 以下是Ui_MainWindow类中与视频显示相关的部分：（如果部署在树莓派上，此处需要改动）
@@ -38,7 +42,7 @@ class Ui_MainWindow(object):
         image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(image)
         self.label.setPixmap(pixmap)
-```        
+```
 ### 计数控件
 读取保存在static/CSV/count.csv文件中的分类次数，并显示在countLayout中的label控件count上。初始状态的static/CSV/count.csv文件为只有一个0。
 
@@ -49,7 +53,7 @@ class Ui_MainWindow(object):
 触发次对话框的条件是点击界面上的pushButton（绑定代码位于window.py中的class Ui_MainWindow中setupUi函数），触发的函数为class Ui_MainWindow中的show_dialog函数。如果部署在树莓派上可改为由距离传感器触发。
 ``` python
   self.pushButton.clicked.connect(self.show_dialog)
-``` 
+```
  这部分的核心就是show_dialog函数。要实现拍照，调用分类模型，在对话框关闭后还实现了主界面计数控件和历史记录控件的更新。（耦合性较大..）
 文件的保存方面只是使用了CSV文件来保存计数、结果和照片路径。（初始状态的static/CSV/count.csv文件为只有一个0。初始状态的static/CSV/history.csv文件为空。）
 ``` python
@@ -97,3 +101,8 @@ class Ui_MainWindow(object):
             item = QtWidgets.QListWidgetItem(QtGui.QIcon(record[1]), record[0])  # 0为类别，1为图片路径
             self.listWidget.addItem(item)
 ```
+
+## TODO List
+
+- 完成树莓派端部署
+- 完成模型云端部署

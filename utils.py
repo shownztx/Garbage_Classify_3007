@@ -31,11 +31,9 @@ def load_image(image_path):
 
 def random_size(image, target_size=None):
     height, width, _ = np.shape(image)
-    if height < width:
-        size_ratio = target_size / height
-    else:
-        size_ratio = target_size / width
-    resize_shape = (int(width * size_ratio), int(height * size_ratio))
+    size_ratio_height = target_size / height
+    size_ratio_width = target_size / width
+    resize_shape = (int(width * size_ratio_width), int(height * size_ratio_height))
     return cv2.resize(image, resize_shape)
 
 
